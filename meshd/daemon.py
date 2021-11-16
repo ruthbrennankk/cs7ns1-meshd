@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from threading import Event, Thread
 from time import sleep
 from uuid import UUID, uuid4
