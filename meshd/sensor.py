@@ -13,6 +13,3 @@ class Sensor:
     def send_data(self, data):
         print('Sending Data to Sync Node \n')
         return None
-
-
-
