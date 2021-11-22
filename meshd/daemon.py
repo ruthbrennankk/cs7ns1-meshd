@@ -6,10 +6,11 @@ from uuid import UUID, uuid4
 
 from discovery import Discovery
 from server import Protocol
+from transport import Transport
 
 DISCOVERY_INTERVAL = 1
 
-def read_discovery(discovery, protocol, stop: Event):
+def read_discovery(discovery, transport, stop: Event):
     '''
     Read discovery packets from the multicast group.
     '''
@@ -19,7 +20,7 @@ def read_discovery(discovery, protocol, stop: Event):
             continue
 
         session, (addr, port) = read_result
-        protocol.update_peers_set(session, addr, port)
+        transport.update_peers_set(session, addr, port)
 
 def send_discovery(discovery: Discovery, stop: Event):
     '''
@@ -29,21 +30,21 @@ def send_discovery(discovery: Discovery, stop: Event):
         discovery.send()
         sleep(DISCOVERY_INTERVAL)
 
-def read_sensor(protocol, stop: Event):
+def read_sensor(transport, stop: Event):
     '''
         Read protocol packets from the our sensor (data generation) nodes
     '''
     while not stop.is_set():
-        read_result = protocol.read_sensor()
+        read_result = transport.read_sensor()
         if read_result is None:
             continue
 
-def read_peer_sensor(protocol, stop: Event):
+def read_peer_sensor(transport, stop: Event):
     '''
        Read protocol packets from the our peers
     '''
     while not stop.is_set():
-        read_result = protocol.read_peer()
+        read_result = transport.read_peer()
         if read_result is None:
             continue
 
@@ -53,21 +54,22 @@ if __name__ == '__main__':
         print('Session %s started' % (session))
 
         protocol = Protocol()
-        discovery = Discovery(protocol.discovery_port, session)
+        discovery = Discovery(protocol.port, session)
+        transport = Transport()
 
         stop = Event()
 
         #   Receive Discovery Thread
-        discovery_recv_thread = Thread(target=read_discovery, args=(discovery, protocol, stop))
+        discovery_recv_thread = Thread(target=read_discovery, args=(discovery, transport, stop))
         discovery_recv_thread.start()
         #   Send Discovery Thread
         discovery_send_thread = Thread(target=send_discovery, args=(discovery, stop))
         discovery_send_thread.start()
         #   Receive Sensor Data Thread
-        peer_sensor_read_thread = Thread(target=read_peer_sensor, args=(protocol, stop))
+        peer_sensor_read_thread = Thread(target=read_peer_sensor, args=(transport, stop))
         peer_sensor_read_thread.start()
         #   Send Sensor Data Thread
-        sensor_read_thread = Thread(target=read_sensor, args=(protocol, stop))
+        sensor_read_thread = Thread(target=read_sensor, args=(transport, stop))
         sensor_read_thread.start()
 
         discovery_recv_thread.join()
@@ -80,3 +82,4 @@ if __name__ == '__main__':
 
         discovery.close()
         protocol.close()
+        # transport.close()
