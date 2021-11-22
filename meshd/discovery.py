@@ -1,9 +1,8 @@
-import hashlib
 import socket
 import struct
-from threading import Thread
-from time import sleep
 from uuid import UUID
+
+from utils import hash_payload
 
 MCAST_GROUP = '224.1.1.1'
 MCAST_PORT = 33210
@@ -44,14 +43,6 @@ class Discovery:
 
         return sock
 
-    def hash_payload(cls, payload):
-        """
-        Calculate the hash of the payload using the shared key.
-        """
-        m = hashlib.sha256()
-        m.update(payload + SHARED_KEY)
-        return m.digest()
-
     def read(self):
         len_packet = 32 + 16 + 2  # 32 bytes hash, 16 bytes session, 2 bytes port
 
@@ -63,7 +54,7 @@ class Discovery:
 
         # verify payload hash against shared key
         hash, payload = struct.unpack('!32s%ds' % (len(bytes) - 32), bytes)
-        if hash != self.hash_payload(payload):
+        if hash != hash_payload(payload):
             print('Received packet of wrong hash from %s:%d' % (remote_addr, remote_port))
             return None
 
@@ -76,7 +67,7 @@ class Discovery:
     def send(self):
         # encode payload and hash
         payload = struct.pack('!16sH', self.session.bytes, self.protocol_port)
-        hash = self.hash_payload(payload)
+        hash = hash_payload(payload)
 
         # construct and send packet
         packet = struct.pack('!32s%ds' % len(payload), hash, payload)
