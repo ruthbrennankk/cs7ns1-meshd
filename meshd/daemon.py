@@ -36,7 +36,6 @@ def read_sensor(transport, stop: Event):
     '''
     while not stop.is_set():
         read_result = transport.read_sensor()
-        sleep(DISCOVERY_INTERVAL*2)
         if read_result is None:
             continue
 
