@@ -20,7 +20,7 @@ def read_discovery(discovery, transport, stop: Event):
             continue
 
         session, (addr, port) = read_result
-        transport.update_peers_set(session, addr, port)
+        transport.update_peers_map(session, addr, port, discovery.protocol_port)
 
 def send_discovery(discovery: Discovery, stop: Event):
     '''
@@ -36,6 +36,7 @@ def read_sensor(transport, stop: Event):
     '''
     while not stop.is_set():
         read_result = transport.read_sensor()
+        sleep(DISCOVERY_INTERVAL*2)
         if read_result is None:
             continue
 
@@ -55,7 +56,7 @@ if __name__ == '__main__':
 
         protocol = Protocol()
         discovery = Discovery(protocol.port, session)
-        transport = Transport()
+        transport = Transport(protocol)
 
         stop = Event()
 
