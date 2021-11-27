@@ -2,8 +2,6 @@ import socket
 import random
 import struct
 
-import sys
-sys.path.insert(0, '/users/ugrad/brennar5/ruth/cs7ns1-meshd/') # location of src
 from meshd.transport.transport import Transport
 
 class Sensor:

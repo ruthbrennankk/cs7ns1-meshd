@@ -1,8 +1,6 @@
 import socket
 import struct
 
-import sys
-sys.path.insert(0, '/users/ugrad/brennar5/ruth/cs7ns1-meshd/') # location of src
 from meshd.utils.sign import hash_payload
 
 class Transport:
