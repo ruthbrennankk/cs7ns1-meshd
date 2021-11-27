@@ -1,100 +1,101 @@
 #!/usr/bin/env python3
 
 from threading import Event, Thread
+from uuid import uuid4, UUID
 from time import sleep
-from uuid import UUID, uuid4
 import argparse
-import time
+import socket
 
-from discovery import Discovery
-from server import Protocol
-from transport import Transport
+from discovery.multicast import MulticastDiscovery
+from meshd.protocol.connection import ProtocolConnection
+from meshd.protocol.manager import ProtocolConnectionManager
+from protocol.server import ProtocolServer
+from meshd.transport.transport import Transport
 
-DISCOVERY_INTERVAL = 3
-SENSOR_INTERVAL = 2
-PEER_INTERVAL = 1
+DISCOVERY_INTERVAL = 1
 
-def read_discovery(discovery, transport, stop: Event):
-    '''
-    Read discovery packets from the multicast group.
-    '''
-    while not stop.is_set():
-        read_result = discovery.read()
-        if read_result is None:
-            continue
 
-        session, (addr, port) = read_result
-        transport.update_peers_map(session, addr, port, discovery.protocol_port)
-        sleep(DISCOVERY_INTERVAL)
+def discovery_main(discovery: MulticastDiscovery,
+                   local_session: UUID,
+                   protocol_manager: ProtocolConnectionManager,
+                   stop_event: Event):
+    cache = {}
 
-def send_discovery(discovery: Discovery, stop: Event):
-    '''
-    Periodically send discovery packets to the multicast group.
-    '''
-    while not stop.is_set():
+    while not stop_event.is_set():
+        result = discovery.read(DISCOVERY_INTERVAL)
+        if result:
+            remote_session, (remote_addr, remote_port) = result
+
+            if (remote_addr, remote_port) in cache:
+                continue
+            cache[(remote_addr, remote_port)] = True
+
+            if remote_session < local_session and remote_session not in protocol_manager:
+                protocol_manager.register_connection(remote_session,ProtocolConnection.connect(local_session, remote_addr, remote_port, protocol_manager, stop_event))
+
         discovery.send()
-        sleep(DISCOVERY_INTERVAL)
 
-def read_sensor(transport: Transport, stop: Event):
-    '''
-        Read protocol packets from the our sensor (data generation) nodes
-    '''
-    while not stop.is_set():
-        transport.read_sensor()
-        sleep(SENSOR_INTERVAL)
+def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, server: ProtocolServer, stop_event: Event):
+    cache = {}
 
-def read_peer_sensor(transport: Transport, stop: Event):
-    '''
-       Read protocol packets from the our peers
-    '''
-    while not stop.is_set():
-        transport.read_peer()
-        sleep(PEER_INTERVAL)
+    for sock in server.accept_until_stop(stop_event):
+        remote_addr, remote_port = sock.getpeername()
 
-if __name__ == '__main__':
+        if (remote_addr, remote_port) in cache:
+            continue
+        cache[(remote_addr, remote_port)] = True
+
+        ProtocolConnection.accept(local_session, sock, manager, stop_event)
+
+def recieve_sensor_data(local_session: UUID, server: ProtocolServer, transport: Transport, protocol_manager:ProtocolConnectionManager, stop_event: Event):
+    for sock in server.accept_until_stop(stop_event):
+        try:
+            res = sock.recv(1024)
+            if (res):
+                (alert_type, data) = transport.recieve_sensor_data(res)
+                protocol_manager.recieved_data(transport, alert_type, data)
+        except socket.timeout:
+            pass
+        sleep(3)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--sensorport', help='Sensor Port Specification', required=True)
+    args = parser.parse_args()
+
+    if args.sensorport is None:
+        print("Please specify the type of sensor")
+        exit(1)
+
+    sensor_port = int(args.sensorport)
+
+    session = uuid4()  # local session id
+    stop = Event()  # root cancellation event
+
     try:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--sensorport', help='Sensor Port Specification', required=True)
-        args = parser.parse_args()
+        protocol_server = ProtocolServer(None)
+        protocol_manager = ProtocolConnectionManager()
+        discovery = MulticastDiscovery(protocol_server.port, session)
+        sensor_server = ProtocolServer(sensor_port)
 
-        if args.sensorport is None:
-            print("Please specify the type of sensor")
-            exit(1)
+        discovery_thread = Thread(target=discovery_main, args=(discovery, session, protocol_manager, stop))
+        discovery_thread.start()
 
-        sensor_port = int(args.sensorport)
+        protocol_accept_thread = Thread(target=protocol_main, args=(session, protocol_manager, protocol_server, stop))
+        protocol_accept_thread.start()
 
-        session = uuid4()
-        print('Session %s started \n' % (session))
+        print(f"Local session {session} started")
 
-        protocol = Protocol(None)
-        sensor_protocol = Protocol(sensor_port)
-        discovery = Discovery(protocol.port, session)
-        transport = Transport(protocol, sensor_protocol)
-
-        stop = Event()
-
-        #   Send Discovery Thread
-        discovery_send_thread = Thread(target=send_discovery, args=(discovery, stop))
-        discovery_send_thread.start()
-        #   Receive Peer Sensor Data Thread
-        peer_sensor_read_thread = Thread(target=read_peer_sensor, args=(transport, stop))
-        peer_sensor_read_thread.start()
-        time.sleep(3)
-        #   Receive Discovery Thread
-        discovery_recv_thread = Thread(target=read_discovery, args=(discovery, transport, stop))
-        discovery_recv_thread.start()
         #   Recieve Sensor Data Thread
-        sensor_read_thread = Thread(target=read_sensor, args=(transport, stop))
+        sensor_read_thread = Thread(target=recieve_sensor_data, args=(session, sensor_server, Transport(), protocol_manager, stop))
         sensor_read_thread.start()
 
-        discovery_recv_thread.join()
-        discovery_send_thread.join()
-        peer_sensor_read_thread.join()
+        discovery_thread.join()
+        protocol_accept_thread.join()
         sensor_read_thread.join()
-
     finally:
         stop.set()
 
-        discovery.close()
-        protocol.close()
-        # transport.close()
+
+if __name__ == '__main__':
+    main()
