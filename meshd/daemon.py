@@ -10,7 +10,7 @@ from server import Protocol
 from transport import Transport
 
 DISCOVERY_INTERVAL = 3
-SENSOR_INTERVAL = 1
+SENSOR_INTERVAL = 2
 PEER_INTERVAL = 1
 
 def read_discovery(discovery, transport, stop: Event):
@@ -48,7 +48,7 @@ def read_peer_sensor(transport: Transport, stop: Event):
     '''
     while not stop.is_set():
         transport.read_peer()
-        sleep(PEER_INTERVAL)
+        # sleep(PEER_INTERVAL)
 
 if __name__ == '__main__':
     try:
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         sensor_port = int(args.sensorport)
 
         session = uuid4()
-        print('Session %s started' % (session))
+        print('Session %s started \n' % (session))
 
         protocol = Protocol(None)
         sensor_protocol = Protocol(sensor_port)

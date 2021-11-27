@@ -21,10 +21,11 @@ class Transport:
         # print('Discovered session %s from %s:%d' % (session, addr, port))
         new_peer = (addr, port)
         if (new_peer != (self.host, own_protocol_port) and new_peer not in self.peers):
-            # TODO : add node id as key
             self.peers.add(new_peer)
-            print('Discovered session %s added to peers (%s:%d) \n' % (session, addr, port))
+            print('Discovered session %s added to peers (%s:%d)' % (session, addr, port))
             print('New Peer List', self.peers)
+            print(' \n')
+
 
     def read_peer(self):
         '''
@@ -33,18 +34,14 @@ class Transport:
         conn, addr = self.protocol.server.accept()
         data = conn.recv(1024)
         # if has hash for data exchange
-        data = data.decode('utf-8')
-        print("Peer Data recieved: " + str(data) + ' \n')
+        # data = data.decode('utf-8')
+        print("Peer Data recieved: " + data.decode() + ' \n')
         conn.close()
 
     def read_sensor(self):
         '''
             Read protocol packets from the our sensors
         '''
-        # data = 'sensor data'
-        # self.send_to_peers(data)
-        # return None
-        #print("Listening for sensor connections on : " + str(ip_addr) + ":" + str(SENSOR_PORT))
         print("Trying to get data from sensor")
         conn, addr = self.sensor_protocol.server.accept()
         data = conn.recv(1024)
@@ -57,21 +54,23 @@ class Transport:
         self.send_to_peers(data)
 
     def send_to_peers(self, data):
+        print('Sending to Known Peers')
         fail_set = set()
         for p in self.peers:
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-                print('sending to peer ...', p)
+                # print('sending to peer ...', p)
                 sock.connect(p)
-                sock.send(data.encode())
+                sock.send(data)
                 sock.close()
             except:
                 fail_set.add(p)
         for p in fail_set:
             self.peers.discard(p)
-            print('Removed Peer: ' + str(p) + ' \n')
+            print('Removed Peer: ' + str(p))
+        print('Sent to Known Peers' + ' \n')
 
     def close(self):
         self.sock.close()
