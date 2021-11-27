@@ -1,6 +1,6 @@
 import hashlib
 
-SHARED_KEY = b'meshd-wip-proto-conn'
+SHARED_KEY = b'meshd-wip-proto-conn-2'
 
 def hash_payload(payload):
     """
