@@ -1,94 +1,143 @@
 import socket
+import random
 import struct
-from time import sleep
+
 from utils import hash_payload
 
-SENSOR_PORT = 33211
+class Sensor:
 
-class Transport:
-    def __init__(self, protocol, sensor_protocol):
-        self.peers = set()
-        self.peers_dict = dict() #   peers - Dict of nodes (adr, port)
-        self.peers_list = dict() #   peers_list = Dict of a peer's peers
-        self.host = socket.gethostbyname(socket.gethostname())
-        self.protocol = protocol
-        self.sensor_protocol = sensor_protocol
+    # generates intial params on start
+    # randomly progresses 'vehicle' down path during each data collection cycle
+    # generates other params randomly.
 
-    def update_peers_map(self, session, addr, port, own_protocol_port):
-        '''
-            Update our peer set based on discovery
-        '''
-        # print('Discovered session %s from %s:%d' % (session, addr, port))
-        new_peer = (addr, port)
-        if (new_peer != (self.host, own_protocol_port) and new_peer not in self.peers):
-            self.peers.add(new_peer)
-            print('Discovered session %s added to peers (%s:%d)' % (session, addr, port))
-            print('New Peer List', self.peers)
-            print(' \n')
+    def __init__(self, sensorType, session, port):
+        self.sensorType = sensorType
+        self.session = session
+        self.port = port
 
+        self.x_pos = random.randint(20,80)
+        self.y_pos = random.randint(20,80)
+        self.x_lim = 100
+        self.y_lim = 100 # defined city block range for travel
+        self.journey_len = random.randint(20,50)
+        self.pressure = 35
+        self.current_step = 0
+        #Added by Mahislami
+        self.fuel = 100
+        self.speed = random.randint(10,90)
+        self.speed_lower_lim = 0
+        self.speed_upper_lim = 90
+        self.fuel_lim = 0
+        self.wind = 0
+        self.humidity = 0
 
-    def read_peer(self):
-        '''
-            Read protocol packets from the our peers
-        '''
-        conn, addr = self.protocol.server.accept()
-        data = conn.recv(1024)
-        # if has hash for data exchange
-        # data = data.decode('utf-8')
-        print("Peer Data recieved: " + data.decode() + ' \n')
-        conn.close()
+    def generate_data(self, sensorType):
+        metricMap = {'position': self.getPos(),
+           'temperature': self.getTemp(),
+           'tyre_pressure': self.getPressure(),
+           'journey_elapsed': self.getElapsed(),
+           'journey_finished': self.getStatus(),
+           'fuel': self.getFuel(),
+           'speed': self.getSpeed(),
+           'wind': self.getWind(),
+           'humidity':self.getHumidity()
+       }
 
-    def read_sensor(self):
-        '''
-            Read protocol packets from the our sensors
-        '''
-        print("Trying to get data from sensor")
-        conn, addr = self.sensor_protocol.server.accept()
-        data = conn.recv(1024)
-        hash, alert_type, payload = struct.unpack('!32si16s', data)
-        if hash != hash_payload(payload):
-            print("Received packet of wrong hash from sensor")
+        print('Collecting data from sensor type:', (sensorType))
+        if sensorType not in metricMap:
+            print('Invalid sensor type found')
             return None
-        data = struct.unpack('!16s', payload)
-        print("Sensor Data recieved: " + str(data) + " with alert_type = " + str(alert_type) + ' \n')
-        if str(alert_type) == 1:
-            print("Current Fuel Level: ",str(data))
-            if(int(data) < 5):
-                print("Low Fuel Level!")
-        elif str(alert_type) == 2:
-            print("Current Speed: ",str(data))
-            if(int(data) > 85):
-                print("Slow Down!")
-        elif str(alert_type) == 3:
-            print("Humidity: ",str(data))
-        elif str(alert_type) == 4:
-            print("Temperature: ",str(data))
-        elif str(alert_type) == 5:
-            print("Journey Finished!")
-        elif str(alert_type) == 6:
-            print("Journey Elapsed: ",str(data))
-        elif str(alert_type) == 8:
-            print("Current Position: ",str(data))
-        self.send_to_peers(data)
+        return metricMap.get(sensorType)
 
-    def send_to_peers(self, data):
-        print('Sending to Known Peers')
-        fail_set = set()
-        for p in self.peers:
-            try:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-                # print('sending to peer ...', p)
-                sock.connect(p)
-                sock.send(data)
-                sock.close()
-            except:
-                fail_set.add(p)
-        for p in fail_set:
-            self.peers.discard(p)
-            print('Removed Peer: ' + str(p))
-        print('Sent to Known Peers' + ' \n')
+    def send_data(self, data):
+        hostname = socket.gethostname()
+        print("Hostname : " + socket.gethostbyname(hostname) + " Port : " + self.port)
+        print('Sending Data to Sync Node \n')
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect_ex((socket.gethostbyname(hostname), int(self.port)))
+        data = str(data)
+        alert_type = 1 # update alert
+        if self.sensorType == 'fuel' or self.sensorType == 'tyre_pressure' or self.sensorType == 'speed':
+            alert_type = 2 # status alert
+        if self.sensorType == 'temperature' or self.sensorType == 'humidity' or self.sensorType == 'wind':
+            alert_type = 3 # environment alert
+        if self.sensorType == 'journey_finished' or self.sensorType == 'journey_elapsed':
+            alert_type = 4 # status alert
 
-    def close(self):
-        self.sock.close()
+
+        payload = struct.pack('!16s', bytes(data, 'utf-8'))
+        hash = hash_payload(payload)
+        packet = struct.pack('!32si16s', hash, alert_type,  payload)
+        print("Sending: " + data + " Alert Type: " + str(alert_type))
+        sock.send(packet)
+        sock.close()
+
+    def getPressure(self):
+        self.pressure = self.pressure - random.uniform(0, 0.5)
+        return self.pressure
+
+    def getTemp(self):
+        return random.uniform(5, 35)
+
+    def getPos(self):
+        if self.current_step < self.journey_len:
+            self.makeMove()
+            self.current_step += 1
+        return (self.x_pos, self.y_pos)
+
+    def getElapsed(self):
+        return self.current_step
+
+    def getStatus(self):
+        if self.current_step < self.journey_len:
+            return False
+        return True
+
+    def makeMove(self):
+         dir = random.randint(1,2) # x or y movement in given move
+         move_len =  random.randint(1,3)
+         disp = [-1,1][random.randrange(2)] * move_len
+         if dir == 1:
+             self.y_pos += disp
+         else:
+             self.x_pos += disp
+         reduceFuel(random.uniform(5, 10))
+         self.limitFuel()
+         self.limitPosition()
+
+    def limitPosition(self): # stay in range
+        if self.x_pos > self.x_lim:
+            self.x_pos = self.x_lim
+        if self.y_pos > self.y_lim:
+            self.y_pos = self.y_lim
+        if self.x_pos < 0:
+            self.x_pos = 0
+        if self.y_pos < 0:
+            self.y_pos = 0
+    
+    def limitFuel():
+         if self.fuel < self.fuel_lim:
+             self.fuel = self.fuel_lim
+             print("Vehicle out of Fuel!")
+
+     def limitSpeed():
+         if self.speed > self.speed_upper_lim:
+             self.speed = self.speed_upper_lim
+         if self.speed < self.speed_lower_lim:
+             self.speed = self.speed_lower_lim
+
+     def reduceFuel(amount):
+         self.fuel = self.fuel - amount
+
+     def getFuel():
+         return self.fuel
+
+     def getHumidity(self):
+         return random.uniform(0, 100)
+
+     def getWind():
+         return random.uniform(0, 25)
+
+     def getSpeed():
+         self.speed = self.speed + random.uniform(-10, 10)
+         return self.speed
