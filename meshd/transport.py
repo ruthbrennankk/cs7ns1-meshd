@@ -33,7 +33,7 @@ class Transport:
         data = conn.recv(1024)
         # if has hash for data exchange
         # data = data.decode('utf-8')
-        print("Peer Data recieved: " + data.decode() + ' \n')
+        print("Peer Data recieved: " + data.decode('utf-8') + ' \n')
         conn.close()
 
     def read_sensor(self):
@@ -46,26 +46,29 @@ class Transport:
         # data = conn.recv(1024)
         # print("Sensor Data recieved: " + str(data))
         data = 'sensor data'
-        self.send_to_peers(data)
+        self.send_to_peers(data.encode())
 
     def send_to_peers(self, data):
-        print('Sending to Known Peers')
-        fail_set = set()
-        for p in self.peers:
-            try:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-                # print('sending to peer ...', p)
-                sock.connect(p)
-                sock.send(data)
-                sock.close()
-            except:
-                fail_set.add(p)
-        for p in fail_set:
-            self.peers.discard(p)
-            print('Removed Peer: ' + str(p))
-        print('Sent to Known Peers' + ' \n')
+        if (len(self.peers) != 0):
+            print('Sending to Known Peers')
+            fail_set = set()
+            for p in self.peers:
+                try:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+                    # print('sending to peer ...', p)
+                    sock.connect(p)
+                    sock.send(data)
+                    sock.close()
+                except:
+                    fail_set.add(p)
+            for p in fail_set:
+                self.peers.discard(p)
+                print('Removed Peer: ' + str(p))
+            print('Sent to Known Peers' + ' \n')
+        else:
+            print('no peers to share with')
 
     def close(self):
         self.sock.close()
