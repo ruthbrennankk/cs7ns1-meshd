@@ -3,9 +3,9 @@ import struct
 from threading import Event, Thread
 from uuid import UUID
 
-from ..utils.sign import hash_payload
-from ..protocol.manager import ProtocolConnectionManager
-from ..transport.transport import Transport
+from meshd.utils.sign import hash_payload
+from meshd.protocol.manager import ProtocolConnectionManager
+from meshd.transport.transport import Transport
 
 READ_TIMEOUT = 1
 

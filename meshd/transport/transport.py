@@ -1,6 +1,6 @@
 import socket
 import struct
-from ..utils.sign import hash_payload
+from meshd.utils.sign import hash_payload
 
 class Transport:
 

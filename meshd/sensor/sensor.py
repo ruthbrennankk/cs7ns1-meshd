@@ -2,7 +2,7 @@ import socket
 import random
 import struct
 
-from ..transport.transport import Transport
+from meshd.transport.transport import Transport
 
 class Sensor:
 

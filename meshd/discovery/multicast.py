@@ -2,7 +2,7 @@ import socket
 import struct
 from uuid import UUID
 
-from ..utils.sign import hash_payload
+from meshd.utils.sign import hash_payload
 
 MCAST_GROUP = '224.1.1.1'
 MCAST_PORT = 33210
