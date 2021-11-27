@@ -2,8 +2,6 @@ import socket
 import random
 import struct
 
-import sys
-sys.path.insert(0, '/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/') # location of src
 from meshd.utils.sign import hash_payload
 from meshd.transport.transport import Transport
 

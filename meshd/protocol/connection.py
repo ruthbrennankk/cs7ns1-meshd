@@ -3,9 +3,6 @@ import struct
 from threading import Event, Thread
 from uuid import UUID
 
-
-import sys
-sys.path.insert(0, '/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/') # location of src
 from meshd.utils.sign import hash_payload
 from meshd.protocol.manager import ProtocolConnectionManager
 from meshd.transport.transport import Transport
