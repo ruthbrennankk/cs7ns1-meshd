@@ -51,6 +51,24 @@ class Transport:
             return None
         data = struct.unpack('!16s', payload)
         print("Sensor Data recieved: " + str(data) + " with alert_type = " + str(alert_type) + ' \n')
+        if str(alert_type) == 1:
+            print("Current Fuel Level: ",str(data))
+            if(int(data) < 5):
+                print("Low Fuel Level!")
+        elif str(alert_type) == 2:
+            print("Current Speed: ",str(data))
+            if(int(data) > 85):
+                print("Slow Down!")
+        elif str(alert_type) == 3:
+            print("Humidity: ",str(data))
+        elif str(alert_type) == 4:
+            print("Temperature: ",str(data))
+        elif str(alert_type) == 5:
+            print("Journey Finished!")
+        elif str(alert_type) == 6:
+            print("Journey Elapsed: ",str(data))
+        elif str(alert_type) == 8:
+            print("Current Position: ",str(data))
         self.send_to_peers(data)
 
     def send_to_peers(self, data):
