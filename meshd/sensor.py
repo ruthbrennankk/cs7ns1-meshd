@@ -30,7 +30,6 @@ class Sensor:
            'journey_elapsed': self.getElapsed(),
            'journey_finished': self.getStatus()}
 
-
         print('Collecting data from sensor type:', (sensorType))
         if sensorType not in metricMap:
             print('Invalid sensor type found')
