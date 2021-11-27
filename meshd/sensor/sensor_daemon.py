@@ -3,7 +3,7 @@ import argparse
 from threading import Event, Thread
 from time import sleep
 
-from meshd.sensor.sensor import Sensor
+from ..sensor.sensor import Sensor
 
 SENSOR_INTERVAL = 5
 

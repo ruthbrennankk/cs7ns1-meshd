@@ -2,8 +2,7 @@ import socket
 import random
 import struct
 
-from meshd.utils.sign import hash_payload
-from meshd.transport.transport import Transport
+from ..transport.transport import Transport
 
 class Sensor:
 
