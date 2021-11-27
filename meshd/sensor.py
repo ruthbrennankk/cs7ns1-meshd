@@ -29,7 +29,7 @@ class Sensor:
         self.speed_upper_lim = 90
         self.fuel_lim = 0
         self.wind = 0
-        self.humidity = 0
+        self.humidity = random.randint(10,80)
 
     def generate_data(self, sensorType):
         metricMap = {'position': self.getPos(),
@@ -56,22 +56,9 @@ class Sensor:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect_ex((socket.gethostbyname(hostname), int(self.port)))
         data = str(data)
-        if self.sensorType == 'fuel'
-            alert_type = 1 # status alert
-        elif self.sensorType == 'speed'
+        alert_type = 1 # update alert
+        if self.sensorType == 'temperature' or self.sensorType == 'tyre_pressure':
             alert_type = 2 # status alert
-        elif self.sensorType == 'humidity'
-            alert_type = 3 # status alert
-        elif self.sensorType == 'temperature'
-            alert_type = 4 # status alert
-        elif self.sensorType == 'journey_finished'
-            alert_type = 5 # status alert
-        elif self.sensorType == 'journey_elapsed'
-            alert_type = 6 # status alert
-        elif self.sensorType == 'wind'
-            alert_type = 7 # status alert
-        elif self.sensorType == 'position'
-            alert_type = 8 # status alert
 
         payload = struct.pack('!16s', bytes(data, 'utf-8'))
         hash = hash_payload(payload)
@@ -101,17 +88,20 @@ class Sensor:
             return False
         return True
 
+    def reduceFuel(self,amount):
+        self.fuel = self.fuel - 5
+
     def makeMove(self):
-         dir = random.randint(1,2) # x or y movement in given move
-         move_len =  random.randint(1,3)
-         disp = [-1,1][random.randrange(2)] * move_len
-         if dir == 1:
-             self.y_pos += disp
-         else:
-             self.x_pos += disp
-         reduceFuel(random.uniform(5, 10))
-         self.limitFuel()
-         self.limitPosition()
+        dir = random.randint(1,2) # x or y movement in given move
+        move_len =  random.randint(1,3)
+        disp = [-1,1][random.randrange(2)] * move_len
+        if dir == 1:
+            self.y_pos += disp
+        else:
+            self.x_pos += disp
+        self.reduceFuel(5)
+        self.limitFuel()
+        self.limitPosition()
 
     def limitPosition(self): # stay in range
         if self.x_pos > self.x_lim:
@@ -123,29 +113,26 @@ class Sensor:
         if self.y_pos < 0:
             self.y_pos = 0
     
-    def limitFuel():
+    def limitFuel(self):
          if self.fuel < self.fuel_lim:
              self.fuel = self.fuel_lim
              print("Vehicle out of Fuel!")
 
-     def limitSpeed():
-         if self.speed > self.speed_upper_lim:
-             self.speed = self.speed_upper_lim
-         if self.speed < self.speed_lower_lim:
-             self.speed = self.speed_lower_lim
+    def limitSpeed(self):
+        if self.speed > self.speed_upper_lim:
+            self.speed = self.speed_upper_lim
+        if self.speed < self.speed_lower_lim:
+            self.speed = self.speed_lower_lim
 
-     def reduceFuel(amount):
-         self.fuel = self.fuel - amount
+    def getFuel(self):
+        return self.fuel
 
-     def getFuel():
-         return self.fuel
+    def getHumidity(self):
+        return random.uniform(0, 100)
 
-     def getHumidity(self):
-         return random.uniform(0, 100)
+    def getWind(self):
+        return random.uniform(0, 25)
 
-     def getWind():
-         return random.uniform(0, 25)
-
-     def getSpeed():
-         self.speed = self.speed + random.uniform(-10, 10)
-         return self.speed
+    def getSpeed(self):
+        self.speed = self.speed + random.uniform(-10, 10)
+        return self.speed
