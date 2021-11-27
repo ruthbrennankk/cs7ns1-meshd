@@ -56,14 +56,22 @@ class Sensor:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect_ex((socket.gethostbyname(hostname), int(self.port)))
         data = str(data)
-        alert_type = 1 # update alert
-        if self.sensorType == 'fuel' or self.sensorType == 'tyre_pressure' or self.sensorType == 'speed':
+        if self.sensorType == 'fuel'
+            alert_type = 1 # status alert
+        elif self.sensorType == 'speed'
             alert_type = 2 # status alert
-        if self.sensorType == 'temperature' or self.sensorType == 'humidity' or self.sensorType == 'wind':
-            alert_type = 3 # environment alert
-        if self.sensorType == 'journey_finished' or self.sensorType == 'journey_elapsed':
+        elif self.sensorType == 'humidity'
+            alert_type = 3 # status alert
+        elif self.sensorType == 'temperature'
             alert_type = 4 # status alert
-
+        elif self.sensorType == 'journey_finished'
+            alert_type = 5 # status alert
+        elif self.sensorType == 'journey_elapsed'
+            alert_type = 6 # status alert
+        elif self.sensorType == 'wind'
+            alert_type = 7 # status alert
+        elif self.sensorType == 'position'
+            alert_type = 8 # status alert
 
         payload = struct.pack('!16s', bytes(data, 'utf-8'))
         hash = hash_payload(payload)
