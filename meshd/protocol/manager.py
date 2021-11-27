@@ -24,7 +24,7 @@ class ProtocolConnectionManager:
     def unregister_connection(self, uuid: UUID):
         connection = self.peers.pop(uuid, None)
         if connection is not None:
-            connection.sock.close()
+            connection.close()
 
     def recieved_data(self, transport, alert_type, data):
         if (len(self.peers) != 0):

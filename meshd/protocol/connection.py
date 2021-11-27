@@ -3,6 +3,9 @@ import struct
 from threading import Event, Thread
 from uuid import UUID
 
+
+import sys
+sys.path.insert(0, '/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/') # location of src
 from meshd.utils.sign import hash_payload
 from meshd.protocol.manager import ProtocolConnectionManager
 from meshd.transport.transport import Transport
@@ -34,6 +37,9 @@ class ProtocolConnection:
         Thread(target=connection.run, args=(stop_event,)).start()
         return connection
 
+    def close(self):
+        pass
+
     def run(self, stop_event: Event):
         remote_addr, remote_port = self.sock.getpeername()
         remote_session = None
@@ -61,14 +67,15 @@ class ProtocolConnection:
             else:
                 print(f'Connected to {remote_session} at {remote_addr}:{remote_port}')
 
+            self.manager.register_connection(remote_session, self)
+
             while not stop_event.is_set():
-                # if (self.incoming):
                 try:
                     res = self.sock.recv(1024)
                     if(res):
                         (alert_type, data) = Transport().recieve_sensor_data(res)
                         print(f'Recieved a peer data alert: {alert_type} message: {data} \n')
-                        Thread(target=self.manager.recieved_data, args=(Transport(), alert_type, data)).start()
+                        # Thread(target=self.manager.recieved_data, args=(Transport(), alert_type, data)).start()
                 except socket.timeout:
                     pass
 

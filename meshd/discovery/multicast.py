@@ -2,6 +2,10 @@ import socket
 import struct
 from uuid import UUID
 
+import sys
+sys.path.insert(0, '/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/') # location of src
+from meshd.utils.sign import hash_payload
+
 MCAST_GROUP = '224.1.1.1'
 MCAST_PORT = 33210
 MCAST_TTL = 2

@@ -7,20 +7,18 @@ import argparse
 import socket
 
 from discovery.multicast import MulticastDiscovery
-from meshd.protocol.connection import ProtocolConnection
-from meshd.protocol.manager import ProtocolConnectionManager
+from protocol.connection import ProtocolConnection
+from protocol.manager import ProtocolConnectionManager
 from protocol.server import ProtocolServer
-from meshd.transport.transport import Transport
+from transport.transport import Transport
 
 DISCOVERY_INTERVAL = 1
-
 
 def discovery_main(discovery: MulticastDiscovery,
                    local_session: UUID,
                    protocol_manager: ProtocolConnectionManager,
                    stop_event: Event):
     cache = {}
-
     while not stop_event.is_set():
         result = discovery.read(DISCOVERY_INTERVAL)
         if result:
@@ -31,7 +29,8 @@ def discovery_main(discovery: MulticastDiscovery,
             cache[(remote_addr, remote_port)] = True
 
             if remote_session < local_session and remote_session not in protocol_manager:
-                protocol_manager.register_connection(remote_session,ProtocolConnection.connect(local_session, remote_addr, remote_port, protocol_manager, stop_event))
+                ProtocolConnection.connect(local_session, remote_addr, remote_port, protocol_manager, stop_event)
+                # protocol_manager.register_connection(remote_session, ProtocolConnection.connect(local_session, remote_addr, remote_port, protocol_manager, stop_event))
 
         discovery.send()
 
@@ -45,6 +44,8 @@ def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, serve
             continue
         cache[(remote_addr, remote_port)] = True
 
+        # protocol_manager.register_connection(remote_session,
+        #                                      ProtocolConnection.accept(local_session, sock, manager, stop_event))
         ProtocolConnection.accept(local_session, sock, manager, stop_event)
 
 def recieve_sensor_data(local_session: UUID, server: ProtocolServer, transport: Transport, protocol_manager:ProtocolConnectionManager, stop_event: Event):
@@ -86,7 +87,6 @@ def main():
 
         print(f"Local session {session} started")
 
-        #   Recieve Sensor Data Thread
         sensor_read_thread = Thread(target=recieve_sensor_data, args=(session, sensor_server, Transport(), protocol_manager, stop))
         sensor_read_thread.start()
 
