@@ -3,6 +3,8 @@ import argparse
 from threading import Event, Thread
 from time import sleep
 
+import sys
+sys.path.insert(0, '/users/ugrad/brennar5/ruth/cs7ns1-meshd/') # location of src
 from meshd.sensor.sensor import Sensor
 
 SENSOR_INTERVAL = 5
