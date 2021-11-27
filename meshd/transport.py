@@ -1,5 +1,7 @@
 import socket
+import struct
 from time import sleep
+from utils import hash_payload
 
 SENSOR_PORT = 33211
 
@@ -42,12 +44,16 @@ class Transport:
         # data = 'sensor data'
         # self.send_to_peers(data)
         # return None
-        # print("Listening for sensor connections on : " + str(ip_addr) + ":" + str(SENSOR_PORT))
-        # print("Trying to get data from sensor")
-        # conn, addr = self.sensor_protocol.server.accept()
-        # data = conn.recv(1024)
-        # print("Sensor Data recieved: " + str(data) + ' \n')
-        data = 'sensor data'
+        #print("Listening for sensor connections on : " + str(ip_addr) + ":" + str(SENSOR_PORT))
+        print("Trying to get data from sensor")
+        conn, addr = self.sensor_protocol.server.accept()
+        data = conn.recv(1024)
+        hash, alert_type, payload = struct.unpack('!32si16s', data)
+        if hash != hash_payload(payload):
+            print("Received packet of wrong hash from sensor")
+            return None
+        data = struct.unpack('!16s', payload)
+        print("Sensor Data recieved: " + str(data) + " with alert_type = " + str(alert_type) + ' \n')
         self.send_to_peers(data)
 
     def send_to_peers(self, data):

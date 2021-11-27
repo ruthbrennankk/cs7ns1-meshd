@@ -44,12 +44,15 @@ class Sensor:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect_ex((socket.gethostbyname(hostname), int(self.port)))
         data = str(data)
-        print("Data : " +  data)
-        #hash = hash_payload(bytes(data, 'utf-8'))
-        #packet = struct.pack(hash, da
-        byte_data = bytes(data, 'utf-8')
-        print(byte_data)
-        sock.send(byte_data)
+        alert_type = 1 # update alert
+        if self.sensorType == 'temperature' or self.sensorType == 'tyre_pressure':
+            alert_type = 2 # status alert
+
+        payload = struct.pack('!16s', bytes(data, 'utf-8'))
+        hash = hash_payload(payload)
+        packet = struct.pack('!32si16s', hash, alert_type,  payload)
+        print("Sending: " + data + " Alert Type: " + str(alert_type))
+        sock.send(packet)
         sock.close()
 
     def getPressure(self):
