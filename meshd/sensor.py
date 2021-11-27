@@ -57,8 +57,13 @@ class Sensor:
         sock.connect_ex((socket.gethostbyname(hostname), int(self.port)))
         data = str(data)
         alert_type = 1 # update alert
-        if self.sensorType == 'temperature' or self.sensorType == 'tyre_pressure':
+        if self.sensorType == 'fuel' or self.sensorType == 'tyre_pressure' or self.sensorType == 'speed':
             alert_type = 2 # status alert
+        if self.sensorType == 'temperature' or self.sensorType == 'humidity' or self.sensorType == 'wind':
+            alert_type = 3 # environment alert
+        if self.sensorType == 'journey_finished' or self.sensorType == 'journey_elapsed':
+            alert_type = 4 # status alert
+
 
         payload = struct.pack('!16s', bytes(data, 'utf-8'))
         hash = hash_payload(payload)
