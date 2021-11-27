@@ -42,9 +42,10 @@ class Transport:
         '''
         # print("Listening for sensor connections on : " + str(ip_addr) + ":" + str(SENSOR_PORT))
         # print("Trying to get data from sensor")
-        conn, addr = self.sensor_protocol.server.accept()
-        data = conn.recv(1024)
-        print("Sensor Data recieved: " + str(data))
+        # conn, addr = self.sensor_protocol.server.accept()
+        # data = conn.recv(1024)
+        # print("Sensor Data recieved: " + str(data))
+        data = 'sensor data'
         self.send_to_peers(data)
 
     def send_to_peers(self, data):
