@@ -22,13 +22,26 @@ class Sensor:
         self.journey_len = random.randint(20,50)
         self.pressure = 35
         self.current_step = 0
+        #Added by Mahislami
+        self.fuel = 100
+        self.speed = random.randint(10,90)
+        self.speed_lower_lim = 0
+        self.speed_upper_lim = 90
+        self.fuel_lim = 0
+        self.wind = 0
+        self.humidity = 0
 
     def generate_data(self, sensorType):
         metricMap = {'position': self.getPos(),
            'temperature': self.getTemp(),
            'tyre_pressure': self.getPressure(),
            'journey_elapsed': self.getElapsed(),
-           'journey_finished': self.getStatus()}
+           'journey_finished': self.getStatus(),
+           'fuel': self.getFuel(),
+           'speed': self.getSpeed(),
+           'wind': self.getWind(),
+           'humidity':self.getHumidity()
+       }
 
         print('Collecting data from sensor type:', (sensorType))
         if sensorType not in metricMap:
@@ -76,14 +89,16 @@ class Sensor:
         return True
 
     def makeMove(self):
-        dir = random.randint(1,2) # x or y movement in given move
-        move_len =  random.randint(1,3)
-        disp = [-1,1][random.randrange(2)] * move_len
-        if dir == 1:
-            self.y_pos += disp
-        else:
-            self.x_pos += disp
-        self.limitPosition()
+         dir = random.randint(1,2) # x or y movement in given move
+         move_len =  random.randint(1,3)
+         disp = [-1,1][random.randrange(2)] * move_len
+         if dir == 1:
+             self.y_pos += disp
+         else:
+             self.x_pos += disp
+         reduceFuel(random.uniform(5, 10))
+         self.limitFuel()
+         self.limitPosition()
 
     def limitPosition(self): # stay in range
         if self.x_pos > self.x_lim:
@@ -94,3 +109,30 @@ class Sensor:
             self.x_pos = 0
         if self.y_pos < 0:
             self.y_pos = 0
+    
+    def limitFuel():
+         if self.fuel < self.fuel_lim:
+             self.fuel = self.fuel_lim
+             print("Vehicle out of Fuel!")
+
+     def limitSpeed():
+         if self.speed > self.speed_upper_lim:
+             self.speed = self.speed_upper_lim
+         if self.speed < self.speed_lower_lim:
+             self.speed = self.speed_lower_lim
+
+     def reduceFuel(amount):
+         self.fuel = self.fuel - amount
+
+     def getFuel():
+         return self.fuel
+
+     def getHumidity(self):
+         return random.uniform(0, 100)
+
+     def getWind():
+         return random.uniform(0, 25)
+
+     def getSpeed():
+         self.speed = self.speed + random.uniform(-10, 10)
+         return self.speed
