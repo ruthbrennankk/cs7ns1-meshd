@@ -4,6 +4,7 @@ from threading import Event, Thread
 from time import sleep
 from uuid import UUID, uuid4
 import argparse
+import time
 
 from discovery import Discovery
 from server import Protocol
@@ -48,7 +49,7 @@ def read_peer_sensor(transport: Transport, stop: Event):
     '''
     while not stop.is_set():
         transport.read_peer()
-        # sleep(PEER_INTERVAL)
+        sleep(PEER_INTERVAL)
 
 if __name__ == '__main__':
     try:
@@ -72,16 +73,17 @@ if __name__ == '__main__':
 
         stop = Event()
 
-        #   Receive Discovery Thread
-        discovery_recv_thread = Thread(target=read_discovery, args=(discovery, transport, stop))
-        discovery_recv_thread.start()
         #   Send Discovery Thread
         discovery_send_thread = Thread(target=send_discovery, args=(discovery, stop))
         discovery_send_thread.start()
-        #   Receive Sensor Data Thread
+        #   Receive Peer Sensor Data Thread
         peer_sensor_read_thread = Thread(target=read_peer_sensor, args=(transport, stop))
         peer_sensor_read_thread.start()
-        #   Send Sensor Data Thread
+        time.sleep(3)
+        #   Receive Discovery Thread
+        discovery_recv_thread = Thread(target=read_discovery, args=(discovery, transport, stop))
+        discovery_recv_thread.start()
+        #   Recieve Sensor Data Thread
         sensor_read_thread = Thread(target=read_sensor, args=(transport, stop))
         sensor_read_thread.start()
 
