@@ -59,7 +59,7 @@ class Transport:
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
                     # print('sending to peer ...', p)
                     sock.connect(p)
-                    sock.send(data)
+                    sock.sendAll(data)
                     sock.close()
                 except:
                     fail_set.add(p)
