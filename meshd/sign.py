@@ -1,6 +1,6 @@
 import hashlib
 
-SHARED_KEY = b'meshd-wip-proto-conn-5'
+SHARED_KEY = b'meshd-wip-proto-conn-6'
 
 # symmetrical map for encoding packet values
 sensorTypeMap = {

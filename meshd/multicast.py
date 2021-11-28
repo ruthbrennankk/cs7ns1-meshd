@@ -8,7 +8,7 @@ MCAST_GROUP = '224.1.1.1'
 MCAST_PORT = 33210
 MCAST_TTL = 2
 
-SHARED_KEY = b'meshd'
+SHARED_KEY = b'meshd3'
 
 class MulticastDiscovery:
     def __init__(self, protocol_port: int, local_session: UUID, mcast_group=MCAST_GROUP, mcast_port=MCAST_PORT):

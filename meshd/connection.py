@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sign import hash_payload
 from sign import decode_alert
+from sign import decode_sensor
 from manager import ProtocolConnectionManager
 from transport import Transport
 

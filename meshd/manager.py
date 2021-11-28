@@ -12,13 +12,13 @@ class ProtocolConnectionManager:
 
     def __init__(self):
         self.peers = {}
-        self.sensor_interactions_queue = queue.Queue(100) # queue of sensor interactions limited to last 100 sensor interactions.
+        self.sensor_q = queue.Queue(100) # queue of sensor interactions limited to last 100 sensor interactions.
 
     def __contains__(self, remote_session: UUID):
         return remote_session in self.peers
 
     def get_sensor_interactions(self):
-        return self.sensor_interactions_queue.queue
+        return self.sensor_q.queue
 
     def register_connection(self, uuid: UUID, connection: ClosableProtocolConnection):
         # self.unregister_connection(uuid)
@@ -39,7 +39,7 @@ class ProtocolConnectionManager:
                 try:
                     connection = self.peers[p]
                     print('peer uuid ', p)
-                    sensor_interactions_queue.put(sensor_type)
+                    self.sensor_q.put(sensor_type)
                     transport.send_data(connection.sock, alert_type, sensor_type, data)
                 except:
                     fail_set.add(p)
