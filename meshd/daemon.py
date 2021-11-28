@@ -6,11 +6,11 @@ from time import sleep
 import argparse
 import socket
 
-from discovery.multicast import MulticastDiscovery
-from protocol.connection import ProtocolConnection
-from protocol.manager import ProtocolConnectionManager
-from protocol.server import ProtocolServer
-from transport.transport import Transport
+from multicast import MulticastDiscovery
+from connection import ProtocolConnection
+from manager import ProtocolConnectionManager
+from server import ProtocolServer
+from transport import Transport
 
 DISCOVERY_INTERVAL = 1
 
