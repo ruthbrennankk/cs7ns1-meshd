@@ -1,4 +1,4 @@
-python3 sensor/sensor_daemon.py --sensortype position --sensorport $1 > /dev/null 2>&1 & 
+python3 sensor/sensor_daemon.py --sensortype position --sensorport $1 > /dev/null 2>&1 &
 echo "Position sensor ready"
 python3 sensor/sensor_daemon.py --sensortype journey_elapsed --sensorport $1 > /dev/null 2>&1 &
 echo "Journey Timer sensor ready"
