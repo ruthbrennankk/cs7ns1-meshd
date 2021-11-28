@@ -38,9 +38,9 @@ if __name__ == '__main__':
         sensor = Sensor(sensor_type, session, sensor_port)
         stop = Event()
 
-        discovery_recv_thread = Thread(target=run_sensor, args=(sensor, sensor_type, stop))
-        discovery_recv_thread.start()
-        discovery_recv_thread.join()
+        sensor_thread = Thread(target=run_sensor, args=(sensor, sensor_type, stop))
+        sensor_thread.start()
+        sensor_thread.join()
 
     finally:
         stop.set()
