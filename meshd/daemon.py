@@ -54,7 +54,7 @@ def recieve_sensor_data(local_session: UUID, server: ProtocolServer, transport: 
         try:
             res = sock.recv(1024)
             if (res):
-                (alert_type, data) = transport.recieve_sensor_data(res)
+                (alert_type, data) = transport.recieve_sensor_data(res, False)
                 protocol_manager.recieved_data(transport, alert_type, data)
         except socket.timeout:
             pass

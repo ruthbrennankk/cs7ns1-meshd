@@ -4,8 +4,8 @@ from threading import Event, Thread
 from uuid import UUID
 
 import sys
-sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
-# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
+# sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
 from meshd.utils.sign import hash_payload
 from meshd.protocol.manager import ProtocolConnectionManager
 from meshd.transport.transport import Transport
@@ -73,8 +73,9 @@ class ProtocolConnection:
                 try:
                     res = self.sock.recv(1024)
                     if(res):
-                        (alert_type, data) = Transport().recieve_sensor_data(res)
-                        print(f'Recieved a peer data alert: {alert_type} message: {data} \n')
+                        # (alert_type, data) = Transport().recieve_sensor_data(res, True)
+                        Transport().recieve_sensor_data(res, True)
+                        # print(f'Recieved a peer data alert: {alert_type} message: {data} \n')
                         # Thread(target=self.manager.recieved_data, args=(Transport(), alert_type, data)).start()
                 except socket.timeout:
                     pass

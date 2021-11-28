@@ -10,7 +10,7 @@ class ProtocolServer:
         if port:
             self.server.bind(('', port))
         else:
-            port = self.next_free_port(self.server, port)
+            self.port = self.next_free_port(self.server, port)
             # self.server.bind(('', port))
         self.server.listen(1)
 
