@@ -39,9 +39,9 @@ def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, serve
 
     for sock in server.accept_until_stop(stop_event):
         remote_addr, remote_port = sock.getpeername()
-        print(f'Got discovery {remote_addr} and port {remote_port}')
+        # print(f'Got discovery {remote_addr} and port {remote_port}')
         if (remote_addr, remote_port) in cache:
-            print(f'Discovery {remote_addr} in Cache')
+            # print(f'Discovery {remote_addr} in Cache')
             continue
         cache[(remote_addr, remote_port)] = True
 
@@ -54,8 +54,10 @@ def recieve_sensor_data(local_session: UUID, server: ProtocolServer, transport: 
         try:
             res = sock.recv(1024)
             if (res):
-                (alert_type, data) = transport.recieve_sensor_data(res, False)
-                protocol_manager.recieved_data(transport, alert_type, data)
+                (alert_type, sensor_type, data) = transport.recieve_sensor_data(res, False)
+                protocol_manager.recieved_data(transport, alert_type, sensor_type, data)
+                # (alert_type, data) = transport.recieve_sensor_data(res, False)
+                # protocol_manager.recieved_data(transport, alert_type, data)
         except socket.timeout:
             pass
         sleep(3)
