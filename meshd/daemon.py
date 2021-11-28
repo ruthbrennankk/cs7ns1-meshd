@@ -76,6 +76,7 @@ def main():
 
     try:
         protocol_server = ProtocolServer(None)
+        print(f'socketname : {protocol_server.server.getsockname()} and hostname : {socket.gethostname()} and addr info {socket.getaddrinfo()}')
         protocol_manager = ProtocolConnectionManager()
         discovery = MulticastDiscovery(protocol_server.port, session)
         sensor_server = ProtocolServer(sensor_port)
