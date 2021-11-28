@@ -70,10 +70,10 @@ def recieve_sensor_data(print_sensors, local_session: UUID, server: ProtocolServ
         if print_sensors:
             for i in range(0,9):
                 print("Sensor: " + str(decode_sensor(i)) + " is currently active: " + str(protocol_manager.get_sensor_status(i)))
-        else:
-            for i in range(0,9):
-                if (protocol_manager.get_sensor_status(i)):
-                    print("Sensor: " + str(decode_sensor(i)) + " is currently INACTIVE")
+        # else:
+        #     for i in range(0,9):
+        #         if (protocol_manager.get_sensor_status(i)):
+        #             print("Sensor: " + str(decode_sensor(i)) + " is currently INACTIVE")
         sleep(3)
 
 def main():
