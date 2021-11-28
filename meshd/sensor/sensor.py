@@ -29,14 +29,13 @@ class Sensor:
         self.speed_upper_lim = 90
         self.fuel_lim = 0
         self.wind = 0
-        self.humidity = 0
+        self.humidity = random.randint(10,80)
 
     def generate_data(self, sensorType):
         metricMap = {'position': self.getPos(),
            'temperature': self.getTemp(),
            'tyre_pressure': self.getPressure(),
            'journey_elapsed': self.getElapsed(),
-           'journey_finished': self.getStatus(),
            'journey_finished': self.getStatus(),
            'fuel': self.getFuel(),
            'speed': self.getSpeed(),
@@ -89,6 +88,9 @@ class Sensor:
             return False
         return True
 
+    def reduceFuel(self,amount):
+        self.fuel = self.fuel - 5
+
     def makeMove(self):
         dir = random.randint(1, 2)  # x or y movement in given move
         move_len = random.randint(1, 3)
@@ -97,7 +99,7 @@ class Sensor:
             self.y_pos += disp
         else:
             self.x_pos += disp
-        self.reduceFuel(random.uniform(5, 10))
+        self.reduceFuel(5)
         self.limitFuel()
         self.limitPosition()
 
