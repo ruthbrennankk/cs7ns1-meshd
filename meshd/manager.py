@@ -11,11 +11,19 @@ class ProtocolConnectionManager:
     # peers: dict[UUID, ClosableProtocolConnection]
 
     def __init__(self):
+
         self.peers = {}
+        self.sensors_status = [False] * 9 # NUM_SENSORS
         self.sensor_q = queue.Queue(100) # queue of sensor interactions limited to last 100 sensor interactions.
 
     def __contains__(self, remote_session: UUID):
         return remote_session in self.peers
+
+    def get_sensor_status(self, sensor_code):
+        return self.sensors_status[int(sensor_code)]
+
+    def set_sensor_status(self, sensor_code, value):
+        self.sensors_status[int(sensor_code)] = value
 
     def get_sensor_interactions(self):
         return self.sensor_q.queue

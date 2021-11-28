@@ -5,6 +5,7 @@ from uuid import uuid4, UUID
 from time import sleep
 import argparse
 import socket
+from sign import decode_sensor
 
 from multicast import MulticastDiscovery
 from connection import ProtocolConnection
@@ -48,25 +49,35 @@ def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, serve
         #                                      ProtocolConnection.accept(local_session, sock, manager, stop_event))
         ProtocolConnection.accept(local_session, sock, manager, stop_event)
 
-def recieve_sensor_data(local_session: UUID, server: ProtocolServer, transport: Transport, protocol_manager:ProtocolConnectionManager, stop_event: Event):
+def recieve_sensor_data(print_sensors, local_session: UUID, server: ProtocolServer, transport: Transport, protocol_manager:ProtocolConnectionManager, stop_event: Event):
     for sock in server.accept_until_stop(stop_event):
         try:
             res = sock.recv(1024)
             if (res):
                 (alert_type, sensor_type, data) = transport.recieve_sensor_data(res)
+                protocol_manager.set_sensor_status(sensor_type, True) # if successful generated data retrieval, set sensor as active
                 protocol_manager.recieved_data(transport, alert_type, sensor_type, data)
         except socket.timeout:
+            # case where sensor has been closed / finished it's operation.
+            protocol_manager.set_sensor_status(sensor_type, False)
             pass
+        if print_sensors:
+            for i in range(0,9):
+                print("Sensor: " + str(decode_sensor(i)) + " is currently active: " + str(protocol_manager.get_sensor_status(i)))
         sleep(3)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--sensorport', help='Sensor Port Specification', required=True)
+    parser.add_argument('--printsensors', help = 'Flag to print sensor activity data', required=False)
     args = parser.parse_args()
 
     if args.sensorport is None:
         print("Please specify the type of sensor")
         exit(1)
+    print_sensors = False
+    if args.printsensors is not None:
+        print_sensors = args.printsensors
 
     sensor_port = int(args.sensorport)
 
@@ -87,7 +98,7 @@ def main():
 
         print(f"Local session {session} started")
 
-        sensor_read_thread = Thread(target=recieve_sensor_data, args=(session, sensor_server, Transport(), protocol_manager, stop))
+        sensor_read_thread = Thread(target=recieve_sensor_data, args=(print_sensors, session, sensor_server, Transport(), protocol_manager, stop))
         sensor_read_thread.start()
 
         discovery_thread.join()
