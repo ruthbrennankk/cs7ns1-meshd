@@ -72,9 +72,10 @@ class ProtocolConnection:
                 try:
                     res = self.sock.recv(1024)
                     if(res):
-                        (alert_type, data) = Transport().recieve_sensor_data(res)
+                        (alert_type, sensor_type, data) = Transport().recieve_sensor_data(res)
                         alert_str = decode_alert(alert_type)
-                        print(f'Recieved a peer data alert: {alert_str} message: {data} \n')
+                        sensor_str = decode_sensor(sensor_type)
+                        print(f'Recieved a peer data alert: {alert_str} Sensor type : {sensor_str} message: {data} \n')
                         # Thread(target=self.manager.recieved_data, args=(Transport(), alert_type, data)).start()
                 except socket.timeout:
                     pass

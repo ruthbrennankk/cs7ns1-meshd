@@ -3,6 +3,7 @@ import random
 import struct
 
 from transport import Transport
+from sign import decode_sensor
 
 class Sensor:
 
@@ -37,7 +38,6 @@ class Sensor:
            'tyre_pressure': self.getPressure(),
            'journey_elapsed': self.getElapsed(),
            'journey_finished': self.getStatus(),
-           'journey_finished': self.getStatus(),
            'fuel': self.getFuel(),
            'speed': self.getSpeed(),
            'wind': self.getWind(),
@@ -64,8 +64,8 @@ class Sensor:
             alert_type = 3  # environment alert
         if self.sensorType == 'journey_finished' or self.sensorType == 'journey_elapsed':
             alert_type = 4  # status alert
-
-        Transport().send_data(sock, alert_type, data)
+        sensor_type_code = decode_sensor(self.sensorType)
+        Transport().send_data(sock, alert_type, sensor_type_code, data)
         sock.close()
 
     def getPressure(self):
