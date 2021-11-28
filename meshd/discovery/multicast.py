@@ -46,7 +46,6 @@ class MulticastDiscovery:
 
     def read(self, read_timeout=None):
         len_packet = 32 + 16 + 2  # 32 bytes hash, 16 bytes session, 2 bytes port
-
         # receive packet
         self.sock.settimeout(read_timeout)
         try:

@@ -39,8 +39,9 @@ def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, serve
 
     for sock in server.accept_until_stop(stop_event):
         remote_addr, remote_port = sock.getpeername()
-
+        print(f'Got discovery {remote_addr} and port {remote_port}')
         if (remote_addr, remote_port) in cache:
+            print(f'Discovery {remote_addr} in Cache')
             continue
         cache[(remote_addr, remote_port)] = True
 
