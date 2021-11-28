@@ -13,7 +13,7 @@ class ProtocolServer:
         _, self.port = self.server.getsockname()
 
     def next_free_port(self, sock, port, min_port=33000, max_port=34000):
-        if port < max_port and port > min_port :
+        if port and port < max_port and port > min_port :
             return port
         p = min_port
         while p <= max_port:
