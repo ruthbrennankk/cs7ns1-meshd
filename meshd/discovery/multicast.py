@@ -1,14 +1,15 @@
 import socket
 import struct
 from uuid import UUID
-
+import sys
+sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
 from meshd.utils.sign import hash_payload
 
 MCAST_GROUP = '224.1.1.1'
 MCAST_PORT = 33210
 MCAST_TTL = 2
 
-SHARED_KEY = b'meshd'
+SHARED_KEY = b'meshd-tester'
 
 class MulticastDiscovery:
     def __init__(self, protocol_port: int, local_session: UUID, mcast_group=MCAST_GROUP, mcast_port=MCAST_PORT):

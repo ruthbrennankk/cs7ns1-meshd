@@ -3,7 +3,8 @@ import struct
 from threading import Event, Thread
 from uuid import UUID
 
-
+import sys
+sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
 from meshd.utils.sign import hash_payload
 from meshd.protocol.manager import ProtocolConnectionManager
 from meshd.transport.transport import Transport
