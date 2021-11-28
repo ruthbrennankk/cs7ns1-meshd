@@ -11,7 +11,7 @@ from meshd.utils.sign import decode_sensor
 class Transport:
 
     def send_data(self, sock, alert_type, sensor_type, data):
-        print("Peer Data sending: " + data)
+        # print("Peer Data sending: " + data)
 
         data = str(data)
         payload = struct.pack('!16s', bytes(data, 'utf-8'))

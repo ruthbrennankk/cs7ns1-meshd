@@ -6,8 +6,10 @@ from time import sleep
 import argparse
 import socket
 
-from meshd.util.sign import decode_sensor
-
+import sys
+sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
+from meshd.utils.sign import decode_sensor
 from discovery.multicast import MulticastDiscovery
 from protocol.connection import ProtocolConnection
 from protocol.manager import ProtocolConnectionManager
