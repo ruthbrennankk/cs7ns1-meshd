@@ -2,6 +2,8 @@ import socket
 import struct
 import sys
 sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
+
 from meshd.utils.sign import hash_payload
 
 class Transport:

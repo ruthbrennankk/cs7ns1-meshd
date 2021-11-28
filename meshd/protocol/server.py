@@ -7,12 +7,16 @@ class ProtocolServer:
     def __init__(self, port, accept_timeout: int = ACCEPT_TIMEOUT):
         self.accept_timeout = accept_timeout
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind(('', self.next_free_port(self.server, port)))
+        if port:
+            self.server.bind(('', port))
+        else:
+            port = self.next_free_port(self.server, port)
+            # self.server.bind(('', port))
         self.server.listen(1)
 
         _, self.port = self.server.getsockname()
 
-    def next_free_port(self, sock, port, min_port=33000, max_port=34000):
+    def next_free_port(self, sock, port: int, min_port=33000, max_port=34000):
         if port and port < max_port and port > min_port :
             return port
         p = min_port
