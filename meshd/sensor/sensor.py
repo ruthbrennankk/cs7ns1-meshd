@@ -41,6 +41,7 @@ class Sensor:
            'journey_elapsed': self.getElapsed(),
            'journey_finished': self.getStatus(),
            'fuel': self.getFuel(),
+           'wind': self.getWind(),
            'speed': self.getSpeed(),
            'humidity':self.getHumidity()
        }
