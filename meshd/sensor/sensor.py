@@ -140,7 +140,8 @@ class Sensor:
 
     def getWind(self):
         # return random.uniform(0, 25)
-        return uuid.uuid1()
+        (a, _, _, _, _, _) = uuid.uuid4().fields
+        return a
 
     def getSpeed(self):
         self.speed = self.speed + random.uniform(-10, 10)
