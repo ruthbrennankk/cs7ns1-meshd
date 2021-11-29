@@ -7,5 +7,5 @@ python3 sensor/sensor_daemon.py --sensortype journey_finished --sensorport $1 >/
 python3 sensor/sensor_daemon.py --sensortype fuel --sensorport $1 >/dev/null 2>&1 &
 python3 sensor/sensor_daemon.py --sensortype package_id --sensorport $1 >/dev/null 2>&1 &
 python3 sensor/sensor_daemon.py --sensortype speed --sensorport $1 >/dev/null 2>&1 &
-python3 sensor/sensor_daemon.py --sensortype humidity --sensorport $1 >/dev/null 2>&1 & #</dev/null 
+python3 sensor/sensor_daemon.py --sensortype humidity --sensorport $1 >/dev/null 2>&1 & #</dev/null
 echo "Node Created and Sensors Started"
