@@ -1,6 +1,7 @@
 import socket
 import random
 import struct
+import uuid
 import sys
 sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
 # sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
@@ -41,7 +42,7 @@ class Sensor:
            'journey_elapsed': self.getElapsed(),
            'journey_finished': self.getStatus(),
            'fuel': self.getFuel(),
-           'wind': self.getWind(),
+           'package_id': self.getWind(),
            'speed': self.getSpeed(),
            'humidity':self.getHumidity()
        }
@@ -138,7 +139,8 @@ class Sensor:
         return random.uniform(0, 100)
 
     def getWind(self):
-        return random.uniform(0, 25)
+        # return random.uniform(0, 25)
+        return uuid.uuid1()
 
     def getSpeed(self):
         self.speed = self.speed + random.uniform(-10, 10)

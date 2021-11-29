@@ -7,9 +7,9 @@ echo "Journey Timer sensor ready"
 python3 sensor/sensor_daemon.py --sensortype journey_finished --sensorport $1 > /dev/null 2>&1 &
 echo "Journey Finished sensor ready"
 python3 sensor/sensor_daemon.py --sensortype fuel --sensorport $1 > /dev/null 2>&1 &
-echo "Wind sensor ready"
-python3 sensor/sensor_daemon.py --sensortype wind --sensorport $1 > /dev/null 2>&1 &
 echo "Fuel sensor ready"
+python3 sensor/sensor_daemon.py --sensortype package_id --sensorport $1 > /dev/null 2>&1 &
+echo "Packet sensor ready"
 python3 sensor/sensor_daemon.py --sensortype speed --sensorport $1 > /dev/null 2>&1 &
 echo "Speed sensor ready"
 python3 sensor/sensor_daemon.py --sensortype humidity --sensorport $1 > /dev/null 2>&1 &

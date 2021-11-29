@@ -19,7 +19,7 @@ sensorTypeMap = {
     4:"journey_finished",
     5:"fuel",
     6:"speed",
-    7:"wind",
+    7:"packet_id",
     8:"humidity",
 
     "position":0,
@@ -29,7 +29,7 @@ sensorTypeMap = {
     "journey_finished":4,
     "fuel":5,
     "speed":6,
-    "wind":7,
+    "packet_id":7,
     "humidity":8
 }
 
