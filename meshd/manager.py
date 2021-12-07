@@ -7,6 +7,7 @@ class ClosableProtocolConnection:
     def close(self):
         pass
 
+# Primary Class Author : Chao, Secondary: Ruth, Anton
 class ProtocolConnectionManager:
     # peers: dict[UUID, ClosableProtocolConnection]
 

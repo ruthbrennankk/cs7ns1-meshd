@@ -3,6 +3,7 @@ from threading import Event
 
 ACCEPT_TIMEOUT = 1
 
+# Primary Class Author : Chao, Secondary: Ruth, Anton
 class ProtocolServer:
     def __init__(self, port, accept_timeout: int = ACCEPT_TIMEOUT):
         self.accept_timeout = accept_timeout

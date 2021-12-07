@@ -2,14 +2,11 @@ from uuid import uuid4
 import argparse
 from threading import Event, Thread
 from time import sleep
-# import sys
-# sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
-# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
-
 from sensor import Sensor
 
 SENSOR_INTERVAL = 5
 
+# Primary Class Author : Ruth, Secondary: Anton, Mohammad
 
 def run_sensor(sensor: Sensor, sensorType, stop: Event):
     while not stop.is_set():

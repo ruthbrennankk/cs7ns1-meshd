@@ -1,9 +1,6 @@
 import socket
 import struct
 from uuid import UUID
-# import sys
-# sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
-# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
 
 from sign import hash_payload
 
@@ -13,6 +10,7 @@ MCAST_TTL = 2
 
 SHARED_KEY = b'meshd-tester'
 
+# Class Author : Chao
 class MulticastDiscovery:
     def __init__(self, protocol_port: int, local_session: UUID, mcast_group=MCAST_GROUP, mcast_port=MCAST_PORT):
         self.protocol_port = protocol_port

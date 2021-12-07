@@ -2,16 +2,13 @@ import socket
 import struct
 from threading import Event, Thread
 from uuid import UUID
-
-# import sys
-# sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
-# # sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
 from sign import hash_payload
 from manager import ProtocolConnectionManager
 from transport import Transport
 
 READ_TIMEOUT = 1
 
+# Primary Class Author : Chao, Secondary: Ruth
 class InvalidRemoteHelloError(Exception):
     def __init__(self, reason):
         super().__init__(reason)

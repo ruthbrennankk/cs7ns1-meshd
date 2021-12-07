@@ -3,11 +3,10 @@ from sign import hash_payload
 from sign import decode_alert
 from sign import decode_sensor
 
+# Primary Class Author : Ruth, Secondary: Anton
 class Transport:
 
     def send_data(self, sock, alert_type, sensor_type, data):
-        # print("Peer Data sending: " + data)
-
         data = str(data)
         payload = struct.pack('!16s', bytes(data, 'utf-8'))
         hash = hash_payload(payload)
@@ -26,7 +25,6 @@ class Transport:
         sensor_str = decode_sensor(sensor_type)
         if (peer):
             print(f'Recieved a peer data alert: {alert_str} Sensor type : {sensor_str} message: {data} \n')
-            # print("Peer Data recieved: " + str(data) + " with alert_type = " + str(alert_type) + ' \n')
         else:
             print("Sensor Data recieved: " + str(data) + " with alert_type = " + str(alert_str) + " from sensor_type =  " + str(decode_sensor(sensor_type)) + ' \n')
         return (alert_type, sensor_type, data)

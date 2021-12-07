@@ -1,5 +1,7 @@
 import hashlib
 
+# Primary Author : Chao
+
 SHARED_KEY = b'meshd-tester'
 
 def hash_payload(payload):
@@ -9,6 +11,8 @@ def hash_payload(payload):
     m = hashlib.sha256()
     m.update(payload + SHARED_KEY)
     return m.digest()
+
+# Primary Author : Anton
 
 # symmetrical map for encoding packet values
 sensorTypeMap = {

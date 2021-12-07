@@ -4,6 +4,7 @@ import uuid
 from transport import Transport
 from sign import decode_sensor
 
+# Primary Class Author : Anton, Secondary: Ruth, Mohammad
 class Sensor:
 
     # generates intial params on start
