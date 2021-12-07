@@ -55,4 +55,4 @@ class ProtocolConnectionManager:
                 print('Removed Peer: ' + str(p))
             print('Sent to Known Peers' + ' \n')
         else:
-            print('no peers to share with')
+            print('no peers to share with' + '\n')
