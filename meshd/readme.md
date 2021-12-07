@@ -1,3 +1,6 @@
+## CS7NS1 Project 3 - 2021/22
+Group Members; Chao Lin, Mohammad Mahdi Eslami, Ruth Brennan and Anton Yamkovoy
+
 ### Scenario
 Our network is set up to emulate delivery robots that operate inside a warehouse. 
 Each robot has an individual sync node, which is responsible for discovering, forming connections and forwarding 
