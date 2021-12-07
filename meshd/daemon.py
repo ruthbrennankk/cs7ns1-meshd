@@ -6,15 +6,15 @@ from time import sleep
 import argparse
 import socket
 
-import sys
-sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
-# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
-from meshd.utils.sign import decode_sensor
-from discovery.multicast import MulticastDiscovery
-from protocol.connection import ProtocolConnection
-from protocol.manager import ProtocolConnectionManager
-from protocol.server import ProtocolServer
-from transport.transport import Transport
+# import sys
+# sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+# # sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
+from sign import decode_sensor
+from multicast import MulticastDiscovery
+from connection import ProtocolConnection
+from manager import ProtocolConnectionManager
+from server import ProtocolServer
+from transport import Transport
 
 DISCOVERY_INTERVAL = 1
 

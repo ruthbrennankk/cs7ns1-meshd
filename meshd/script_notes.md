@@ -1,6 +1,6 @@
 # PORT RANGE
-# 33000 -
-# 33201 +
+33000 -
+33201 +
 
 # START SYNC/PEER NODE
 python3 daemon.py --sensorport 33215
