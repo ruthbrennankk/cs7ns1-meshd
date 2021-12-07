@@ -1,8 +1,13 @@
 import socket
 import random
 import struct
+import uuid
+import sys
+sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
 
 from meshd.transport.transport import Transport
+from meshd.utils.sign import decode_sensor
 
 class Sensor:
 
@@ -22,7 +27,6 @@ class Sensor:
         self.journey_len = random.randint(20,50)
         self.pressure = 35
         self.current_step = 0
-        # Added by Mahislami
         self.fuel = 100
         self.speed = random.randint(10, 90)
         self.speed_lower_lim = 0
@@ -38,8 +42,8 @@ class Sensor:
            'journey_elapsed': self.getElapsed(),
            'journey_finished': self.getStatus(),
            'fuel': self.getFuel(),
+           'package_id': self.getWind(),
            'speed': self.getSpeed(),
-           'wind': self.getWind(),
            'humidity':self.getHumidity()
        }
 
@@ -63,8 +67,9 @@ class Sensor:
             alert_type = 3  # environment alert
         if self.sensorType == 'journey_finished' or self.sensorType == 'journey_elapsed':
             alert_type = 4  # status alert
-
-        Transport().send_data(sock, alert_type, data)
+        sensor_type_code = decode_sensor(self.sensorType)
+        Transport().send_data(sock, alert_type, sensor_type_code, data)
+        # Transport().send_data(sock, alert_type, data)
         sock.close()
 
     def getPressure(self):
@@ -99,7 +104,7 @@ class Sensor:
             self.y_pos += disp
         else:
             self.x_pos += disp
-        self.reduceFuel(5)
+        self.reduceFuel(random.uniform(5, 10))
         self.limitFuel()
         self.limitPosition()
 
@@ -134,7 +139,9 @@ class Sensor:
         return random.uniform(0, 100)
 
     def getWind(self):
-        return random.uniform(0, 25)
+        # return random.uniform(0, 25)
+        (a, _, _, _, _, _) = uuid.uuid4().fields
+        return a
 
     def getSpeed(self):
         self.speed = self.speed + random.uniform(-10, 10)

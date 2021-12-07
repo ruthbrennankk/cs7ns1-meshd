@@ -6,6 +6,10 @@ from time import sleep
 import argparse
 import socket
 
+import sys
+sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
+from meshd.utils.sign import decode_sensor
 from discovery.multicast import MulticastDiscovery
 from protocol.connection import ProtocolConnection
 from protocol.manager import ProtocolConnectionManager
@@ -39,8 +43,9 @@ def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, serve
 
     for sock in server.accept_until_stop(stop_event):
         remote_addr, remote_port = sock.getpeername()
-
+        # print(f'Got discovery {remote_addr} and port {remote_port}')
         if (remote_addr, remote_port) in cache:
+            # print(f'Discovery {remote_addr} in Cache')
             continue
         cache[(remote_addr, remote_port)] = True
 
@@ -48,25 +53,41 @@ def protocol_main(local_session: UUID, manager: ProtocolConnectionManager, serve
         #                                      ProtocolConnection.accept(local_session, sock, manager, stop_event))
         ProtocolConnection.accept(local_session, sock, manager, stop_event)
 
-def recieve_sensor_data(local_session: UUID, server: ProtocolServer, transport: Transport, protocol_manager:ProtocolConnectionManager, stop_event: Event):
+def recieve_sensor_data(print_sensors, local_session: UUID, server: ProtocolServer, transport: Transport, protocol_manager:ProtocolConnectionManager, stop_event: Event):
     for sock in server.accept_until_stop(stop_event):
         try:
             res = sock.recv(1024)
             if (res):
-                (alert_type, data) = transport.recieve_sensor_data(res)
-                protocol_manager.recieved_data(transport, alert_type, data)
+                (alert_type, sensor_type, data) = transport.recieve_sensor_data(res, False)
+                protocol_manager.set_sensor_status(sensor_type, True) # if successful generated data retrieval, set sensor as active
+                protocol_manager.recieved_data(transport, alert_type, sensor_type, data)
+                # (alert_type, data) = transport.recieve_sensor_data(res, False)
+                # protocol_manager.recieved_data(transport, alert_type, data)
         except socket.timeout:
+            # case where sensor has been closed / finished it's operation.
+            protocol_manager.set_sensor_status(sensor_type, False)
             pass
+        if print_sensors:
+            for i in range(0,9):
+                print("Sensor: " + str(decode_sensor(i)) + " is currently active: " + str(protocol_manager.get_sensor_status(i)))
+        # else:
+        #     for i in range(0,9):
+        #         if (protocol_manager.get_sensor_status(i)):
+        #             print("Sensor: " + str(decode_sensor(i)) + " is currently INACTIVE")
         sleep(3)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--sensorport', help='Sensor Port Specification', required=True)
+    parser.add_argument('--printsensors', help = 'Flag to print sensor activity data', required=False)
     args = parser.parse_args()
 
     if args.sensorport is None:
         print("Please specify the type of sensor")
         exit(1)
+    print_sensors = False
+    if args.printsensors is not None:
+        print_sensors = args.printsensors
 
     sensor_port = int(args.sensorport)
 
@@ -75,6 +96,7 @@ def main():
 
     try:
         protocol_server = ProtocolServer(None)
+        # print(f'socketname : {protocol_server.server.getsockname()} and hostname : {socket.gethostname()} and addr info {socket.getaddrinfo(socket.gethostname(), protocol_server.port)}')
         protocol_manager = ProtocolConnectionManager()
         discovery = MulticastDiscovery(protocol_server.port, session)
         sensor_server = ProtocolServer(sensor_port)
@@ -87,7 +109,7 @@ def main():
 
         print(f"Local session {session} started")
 
-        sensor_read_thread = Thread(target=recieve_sensor_data, args=(session, sensor_server, Transport(), protocol_manager, stop))
+        sensor_read_thread = Thread(target=recieve_sensor_data, args=(print_sensors, session, sensor_server, Transport(), protocol_manager, stop))
         sensor_read_thread.start()
 
         discovery_thread.join()

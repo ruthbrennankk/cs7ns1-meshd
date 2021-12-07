@@ -2,6 +2,9 @@ from uuid import uuid4
 import argparse
 from threading import Event, Thread
 from time import sleep
+import sys
+sys.path.insert(0,'/users/ugrad/brennar5/ruth/cs7ns1-meshd/')
+# sys.path.insert(0,'/Users/ruthbrennan/Documents/5th_Year/cs7ns1-meshd/')
 
 from meshd.sensor.sensor import Sensor
 
@@ -38,9 +41,9 @@ if __name__ == '__main__':
         sensor = Sensor(sensor_type, session, sensor_port)
         stop = Event()
 
-        discovery_recv_thread = Thread(target=run_sensor, args=(sensor, sensor_type, stop))
-        discovery_recv_thread.start()
-        discovery_recv_thread.join()
+        sensor_thread = Thread(target=run_sensor, args=(sensor, sensor_type, stop))
+        sensor_thread.start()
+        sensor_thread.join()
 
     finally:
         stop.set()
